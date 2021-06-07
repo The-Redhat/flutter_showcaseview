@@ -61,6 +61,8 @@ class Showcase extends StatefulWidget {
   final bool? disposeOnTap;
   final bool disableAnimation;
   final EdgeInsets overlayPadding;
+  final Widget Function(BuildContext context, VoidCallback onForward)?
+      forwardButtonBuilder;
 
   const Showcase(
       {required this.key,
@@ -82,6 +84,7 @@ class Showcase extends StatefulWidget {
       this.contentPadding =
           const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       this.onToolTipClick,
+      this.forwardButtonBuilder,
       this.overlayPadding = EdgeInsets.zero})
       : height = null,
         width = null,
@@ -120,6 +123,7 @@ class Showcase extends StatefulWidget {
     this.disableAnimation = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.overlayPadding = EdgeInsets.zero,
+    this.forwardButtonBuilder,
   })  : showArrow = false,
         onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0,
@@ -255,7 +259,9 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
         child: Stack(
           children: [
             GestureDetector(
-              onTap: _nextIfAny,
+              onTap: widget.forwardButtonBuilder == null
+                  ? _nextIfAny
+                  : _getOnTargetTap,
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
@@ -292,6 +298,8 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
               onTooltipTap: _getOnTooltipTap,
               contentPadding: widget.contentPadding,
             ),
+            if (widget.forwardButtonBuilder != null)
+              widget.forwardButtonBuilder!(context, _nextIfAny),
           ],
         ),
       );
